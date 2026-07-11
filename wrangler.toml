@@ -1,13 +1,11 @@
-name = "whale-surfer"
+name = "whalesurfer"
 main = "index.js"
 compatibility_date = "2026-07-11"
 
-# CORREÇÃO: Usando colchetes duplos para definir a regra como um item de array
-[[rules]]
-type = "Text"
-globs = ["*.csv"]
+# Ativa o upload do arquivo grande como asset estático (Limite de 25MB por arquivo no plano free)
+[assets]
+directory = "./public"
 
-# CORREÇÃO: Usando colchetes duplos para mapear a rota corretamente
 [[routes]]
 pattern = "search.gmcorporation.com.br/*"
 zone_name = "gmcorporation.com.br"
