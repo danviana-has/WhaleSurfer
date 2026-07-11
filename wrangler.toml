@@ -2,11 +2,12 @@ name = "whale-surfer"
 main = "index.js"
 compatibility_date = "2026-07-11"
 
-# Faz o Cloudflare ler o arquivo CSV como texto puro dentro do código
-[rules]
+# CORREÇÃO: Usando colchetes duplos para definir a regra como um item de array
+[[rules]]
 type = "Text"
 globs = ["*.csv"]
 
-[routes]
+# CORREÇÃO: Usando colchetes duplos para mapear a rota corretamente
+[[routes]]
 pattern = "search.gmcorporation.com.br/*"
 zone_name = "gmcorporation.com.br"
