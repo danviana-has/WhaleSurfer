@@ -1,14 +1,24 @@
 // Variável global na memória RAM da Edge para reter os dados após a primeira leitura
 let listaDominios = null;
 
-async function carregarDominiosDoAsset(env) {
+async function carregarDominiosDoAsset(request, env) {
   // Se a lista já foi processada antes, reaproveita a mesma da memória RAM
   if (listaDominios) return listaDominios;
 
   try {
-    // Faz a requisição interna para o arquivo guardado na pasta estática public/
-    const resposta = await env.ASSETS.fetch(new URL('/top-1m.csv', 'http://localhost'));
+    // CORREÇÃO: Descobre dinamicamente a origem real (ex: https://search.gmcorporation.com.br)
+    // para buscar o arquivo top-1m.csv no local correto dentro da infraestrutura da Cloudflare
+    const urlOriginal = new URL(request.url);
+    const urlAsset = new URL('/top-1m.csv', urlOriginal.origin);
+    
+    const resposta = await env.ASSETS.fetch(urlAsset);
     const csvDadosBrutos = await resposta.text();
+
+    // Validação de segurança para garantir que o arquivo foi lido com sucesso
+    if (!csvDadosBrutos || resposta.status !== 200) {
+      console.error(`Erro ao ler o arquivo dos assets. Status HTTP: ${resposta.status}`);
+      return [];
+    }
 
     listaDominios = csvDadosBrutos
       .split('\n')
@@ -27,7 +37,7 @@ async function carregarDominiosDoAsset(env) {
 
     return listaDominios;
   } catch (erro) {
-    console.error("Erro ao carregar o arquivo de domínios:", erro);
+    console.error("Erro fatal ao carregar o arquivo de domínios:", erro);
     return [];
   }
 }
@@ -45,12 +55,12 @@ export default {
         });
       }
 
-      // Garante a recuperação dos domínios da memória global
-      const dominios = await carregarDominiosDoAsset(env);
+      // CORREÇÃO: Passando o request para mapear a URL da Cloudflare
+      const dominios = await carregarDominiosDoAsset(request, env);
       const resultados = [];
       const limite = 50;
 
-      // Realiza a varredura linear super veloz sobre o array de strings
+      // Varredura linear veloz sobre o array de strings na memória
       for (const dominio of dominios) {
         if (dominio.includes(query)) {
           resultados.push(`https://${dominio}`);
