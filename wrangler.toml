@@ -2,9 +2,10 @@ name = "whalesurfer"
 main = "index.js"
 compatibility_date = "2026-07-11"
 
-# Ativa o upload do arquivo grande como asset estático (Limite de 25MB por arquivo no plano free)
-[assets]
-directory = "./public"
+# Diz para o compilador do GitHub ler arquivos CSV como texto puro na hora do build
+[[rules]]
+type = "Text"
+globs = ["**/*.csv"]
 
 [[routes]]
 pattern = "search.gmcorporation.com.br/*"
